@@ -10,15 +10,19 @@ const mongoose = require("mongoose");
 
 
 
+
+
 dotenv.config();
 
 app.use("/static", express.static("public"));
 app.use(express.urlencoded({extended:true}));
 
-mongoose.set("useFindAndModify",false);
-mongoose.connect(process.env.DB_CONNECT, {useNewUrlParser:true}, () =>{
+mongoose.set("useFindAndModify", false);
+mongoose.connect(process.env.DB_CONNECT, {
+  useNewUrlParser: true
+}, () => {
   console.log("connected to db!");
-  app.listen(3000, ()=>console.log("server up and running"));
+  app.listen(3000, () => console.log("server up and running"));
 });
 
 app.set("view engine", "ejs");
@@ -46,11 +50,37 @@ app.get("/", (req, res) => {
   });
 });
 
+//SORT
+function sortByDate(){
+  app.get("/", (req, res) =>{
+    TodoTask.find({},(err, tasks) => {
+      if (err){
+        console.log(err);
+      }
+      else{
+        res.render("todo.ejs", {
+          todoTasks:tasks
+        });
+      }
+      }
+    ).sort({'datefield':-1});
+  });
+  // app.post((req, res) => {
+  //     const date = req.params.date;
+  //     TodoTask.findByIdAndUpdate(date, {
+  //       content: req.body.content
+  //     }, err => {
+  //       if (err) return res.send(500, err);
+  //       res.redirect("/");
+  //     });
+  //   });
+}
 //UPDATE
 app
   .route("/edit/:id")
   .get((req, res) => {
     const id = req.params.id;
+    const date = req.params.date;
     TodoTask.find({}, (err, tasks) => {
       res.render("todoEdit.ejs", {
         todoTasks: tasks,
