@@ -8,6 +8,9 @@ const dotenv = require("dotenv");
 
 const mongoose = require("mongoose");
 
+const router = express.Router();
+
+
 
 
 
@@ -23,6 +26,14 @@ mongoose.connect(process.env.DB_CONNECT, {
 }, () => {
   console.log("connected to db!");
   app.listen(3000, () => console.log("server up and running"));
+  var dbo = db.db("todo");
+  var mysort = {date:1};
+  dbo.collection("todotasks").find().sort(mysort).toArray(function(err, result)
+{
+  if (err) throw (err);
+  console.log(result);
+  db.close();
+});
 });
 
 app.set("view engine", "ejs");
@@ -50,31 +61,24 @@ app.get("/", (req, res) => {
   });
 });
 
-//SORT
-function sortByDate(){
-  app.get("/", (req, res) =>{
-    TodoTask.find({},(err, tasks) => {
-      if (err){
-        console.log(err);
-      }
-      else{
-        res.render("todo.ejs", {
-          todoTasks:tasks
-        });
-      }
-      }
-    ).sort({'datefield':-1});
-  });
-  // app.post((req, res) => {
-  //     const date = req.params.date;
-  //     TodoTask.findByIdAndUpdate(date, {
-  //       content: req.body.content
-  //     }, err => {
-  //       if (err) return res.send(500, err);
-  //       res.redirect("/");
-  //     });
-  //   });
-}
+//SORT METHOD
+// mongoose.conenct(url, function(err, db){
+//   if (err) throw err;
+//   var dbo = db.db("todo");
+//   var mysort = {date:1};
+//   dbo.collection("todotasks").find().sort(mysort).toArray(function(err, result)
+// {
+//   if (err) throw err;
+//   console.log(result);
+//   db.close();
+// });
+// });
+//
+
+//TESTING
+async function hello() { return "Hello, is this working?" };
+hello().then((value) => console.log(value));
+
 //UPDATE
 app
   .route("/edit/:id")
